@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moderation-consumer
+  namespace: openchat-dev
+spec:
+  template:
+    spec:
+      containers:
+        - name: moderation-consumer
+          env:
+            - name: MODERATION_MODE
+              value: "openfaas"
+            - name: OPENFAAS_MODERATION_URL
+              value: "http://gateway.openfaas:8080/function/moderation-fn"

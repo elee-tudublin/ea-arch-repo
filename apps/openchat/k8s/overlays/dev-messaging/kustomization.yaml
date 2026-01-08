@@ -1,0 +1,8 @@
+resources:
+  - ../dev
+  - messaging-secret.yaml
+  - moderation-consumer.yaml
+
+patches:
+  - path: configmap-messaging.yaml
+  - path: post-svc-amqp-patch.yaml

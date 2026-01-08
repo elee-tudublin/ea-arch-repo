@@ -1,0 +1,23 @@
+alertmanager:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+server:
+  persistentVolume:
+    enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  extraScrapeConfigs: |
+    - job_name: "otel-collector"
+      static_configs:
+        - targets: ["otel-collector.observability:9464"]

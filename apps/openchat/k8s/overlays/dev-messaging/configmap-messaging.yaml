@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openchat-config
+  namespace: openchat-dev
+data:
+  ENABLE_MESSAGING: "true"

@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: openchat-dev
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: openchat
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initdb
+  namespace: openchat-dev
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS country (
+      code TEXT PRIMARY KEY,
+      name TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS thread (
+      id SERIAL PRIMARY KEY,
+      topic TEXT NOT NULL,
+      country_code TEXT NOT NULL REFERENCES country(code)
+    );
+
+    CREATE TABLE IF NOT EXISTS post (
+      id SERIAL PRIMARY KEY,
+      thread_id INT NOT NULL REFERENCES thread(id) ON DELETE CASCADE,
+      text TEXT NOT NULL,
+      country_code TEXT NOT NULL REFERENCES country(code),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_post_thread_id ON post(thread_id);
+
+    CREATE TABLE IF NOT EXISTS processed_event (
+      consumer_name TEXT NOT NULL,
+      event_id UUID NOT NULL,
+      processed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (consumer_name, event_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS moderation (
+      post_id INT PRIMARY KEY REFERENCES post(id) ON DELETE CASCADE,
+      decision TEXT NOT NULL,
+      reason_code TEXT NOT NULL,
+      confidence REAL NOT NULL DEFAULT 0,
+      moderated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    INSERT INTO country(code, name) VALUES
+      ('IE', 'Ireland'),
+      ('GB', 'United Kingdom'),
+      ('US', 'United States')
+    ON CONFLICT (code) DO NOTHING;
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: openchat-dev
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: openchat-dev
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: pg
+          env:
+            - name: POSTGRES_DB
+              value: openchat
+            - name: POSTGRES_USER
+              value: openchat
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: initdb
+          configMap:
+            name: postgres-initdb
+  volumeClaimTemplates: []
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: openchat-dev
+spec:
+  selector:
+    app: postgres
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432

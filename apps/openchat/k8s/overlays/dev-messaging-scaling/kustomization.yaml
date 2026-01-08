@@ -1,0 +1,4 @@
+resources:
+  - ../dev-messaging
+  - scaledobject-rabbitmq.yaml
+  - burst-job.yaml

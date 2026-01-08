@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moderation-consumer
+  namespace: openchat-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moderation-consumer
+  template:
+    metadata:
+      labels:
+        app: moderation-consumer
+    spec:
+      containers:
+        - name: moderation-consumer
+          image: openchat/moderation-consumer:1.0.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: openchat-config
+          env:
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-conn
+                  key: RABBITMQ_URL
+            - name: MODERATION_MODE
+              value: "local"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi

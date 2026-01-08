@@ -1,0 +1,21 @@
+auth:
+  username: user
+  password: password
+  erlangCookie: "course-cookie"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+persistence:
+  enabled: false
+
+metrics:
+  enabled: true
+
+service:
+  type: ClusterIP

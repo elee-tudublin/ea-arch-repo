@@ -1,0 +1,41 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: moderation-consumer-scale
+  namespace: openchat-dev
+spec:
+  scaleTargetRef:
+    name: moderation-consumer
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  pollingInterval: 5
+  cooldownPeriod: 30
+  triggers:
+    - type: rabbitmq
+      metadata:
+        protocol: amqp
+        queueName: moderation_queue
+        mode: QueueLength
+        value: "20"
+      authenticationRef:
+        name: rabbitmq-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: rabbitmq-auth
+  namespace: openchat-dev
+spec:
+  secretTargetRef:
+    - parameter: host
+      name: rabbitmq-conn-keda
+      key: host
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rabbitmq-conn-keda
+  namespace: openchat-dev
+type: Opaque
+stringData:
+  host: "amqp://user:password@rabbitmq.messaging:5672/"
