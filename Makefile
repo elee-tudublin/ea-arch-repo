@@ -75,11 +75,12 @@ platform-keda:
 	  "$$KEDA_CHART" "$$KEDA_VERSION" platform/keda/values.yaml
 
 platform-openfaas:
+	kubectl create namespace openfaas >/dev/null 2>&1 || true
+	kubectl create namespace openfaas-fn >/dev/null 2>&1 || true
 	./scripts/resolve_versions.sh
 	@source versions.lock && \
 	./scripts/helm_install_component.sh openfaas openfaas openfaas \
 	  "$$OPENFAAS_CHART" "$$OPENFAAS_VERSION" platform/openfaas/values.yaml
-	kubectl create namespace openfaas-fn >/dev/null 2>&1 || true
 
 platform-kyverno:
 	./scripts/resolve_versions.sh
