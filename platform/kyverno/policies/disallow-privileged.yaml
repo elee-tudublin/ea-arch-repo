@@ -11,6 +11,17 @@ spec:
         resources:
           kinds:
             - Pod
+      exclude:
+        resources:
+          namespaces:
+            - velero
+            - kyverno
+            - kube-system
+            - observability
+            - messaging
+            - openfaas
+            - openfaas-fn
+            - identity
       validate:
         message: "Privileged containers are not allowed."
         pattern:

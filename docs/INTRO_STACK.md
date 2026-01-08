@@ -207,3 +207,9 @@ The architectural concepts remain the same:
 - scaling policies and continuity planning
 - security guardrails and audit evidence
 
+
+
+Passwords:
+
+Openfass: 6tULaH1RMGFU
+

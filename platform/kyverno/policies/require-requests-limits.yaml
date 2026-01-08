@@ -11,6 +11,17 @@ spec:
         resources:
           kinds:
             - Pod
+      exclude:
+        resources:
+          namespaces:
+            - velero
+            - kyverno
+            - kube-system
+            - observability
+            - messaging
+            - openfaas
+            - openfaas-fn
+            - identity
       validate:
         message: "CPU/memory requests and limits are required."
         pattern:
