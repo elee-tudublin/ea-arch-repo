@@ -22,13 +22,6 @@ credentials:
       aws_access_key_id=minio
       aws_secret_access_key=minio12345
 
-# Some charts/hooks use a kubectl image. Avoid broken or unavailable tags.
-# If your chart ignores this key, you must pin a chart version that works.
-kubectl:
-  image:
-    repository: registry.k8s.io/kubectl
-    tag: v1.34.2
-
 resources:
   requests:
     cpu: 50m
