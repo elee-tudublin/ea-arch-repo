@@ -22,12 +22,12 @@ credentials:
       aws_access_key_id=minio
       aws_secret_access_key=minio12345
 
-initContainers:
-  - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws:v1.11.0
-    volumeMounts:
-      - mountPath: /target
-        name: plugins
+# Some charts/hooks use a kubectl image. Avoid broken or unavailable tags.
+# If your chart ignores this key, you must pin a chart version that works.
+kubectl:
+  image:
+    repository: registry.k8s.io/kubectl
+    tag: v1.34.2
 
 resources:
   requests:
@@ -36,3 +36,10 @@ resources:
   limits:
     cpu: 300m
     memory: 512Mi
+
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.11.0
+    volumeMounts:
+      - mountPath: /target
+        name: plugins

@@ -63,10 +63,7 @@ scaling:
 	kubectl apply -k apps/openchat/k8s/overlays/dev-messaging-scaling
 
 platform-rabbitmq:
-	./scripts/resolve_versions.sh
-	@source versions.lock && \
-	./scripts/helm_install_component.sh rabbitmq messaging rabbitmq \
-	  "$$RABBITMQ_CHART" "$$RABBITMQ_VERSION" platform/messaging/rabbitmq-values.yaml
+	kubectl apply -f platform/messaging/rabbitmq.yaml
 
 platform-keda:
 	./scripts/resolve_versions.sh
@@ -120,3 +117,7 @@ pf:
 
 clean:
 	kubectl delete ns openchat-dev --ignore-not-found=true
+
+apps-force:
+	make -B apps
+
