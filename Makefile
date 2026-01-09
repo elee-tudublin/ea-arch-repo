@@ -92,6 +92,11 @@ platform-kyverno:
 	@source versions.lock && \
 	./scripts/helm_install_component.sh kyverno kyverno kyverno \
 	  "$$KYVERNO_CHART" "$$KYVERNO_VERSION" platform/kyverno/values.yaml
+	@echo "Waiting for Kyverno CRDs to be registered..."
+	@for i in 1 2 3 4 5 6 7 8 9 10 11 12; do \
+	  kubectl get crd clusterpolicies.kyverno.io >/dev/null 2>&1 && break; \
+	  sleep 5; \
+	done
 	kubectl apply -f platform/kyverno/policies/require-requests-limits.yaml
 	kubectl apply -f platform/kyverno/policies/disallow-privileged.yaml
 
