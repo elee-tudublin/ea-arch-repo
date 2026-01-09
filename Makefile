@@ -45,8 +45,12 @@ obs:
 	  -f platform/observability/grafana-values.yaml
 
 apps:
-	docker build -t openchat/thread-svc:1.0.0 apps/openchat/services/thread-svc
-	docker build -t openchat/post-svc:1.0.0 apps/openchat/services/post-svc
+	docker build -t openchat/thread-svc:1.0.0 \
+	  -f apps/openchat/services/thread-svc/Dockerfile \
+	  apps/openchat/services
+	docker build -t openchat/post-svc:1.0.0 \
+	  -f apps/openchat/services/post-svc/Dockerfile \
+	  apps/openchat/services
 	docker build -t openchat/moderation-consumer:1.0.0 apps/openchat/workers/moderation-consumer
 	docker build -t openchat/burst-publisher:1.0.0 apps/openchat/tools/burst-publisher
 	k3d image import -c ea-k3d \

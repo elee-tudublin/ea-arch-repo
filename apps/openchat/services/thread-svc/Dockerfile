@@ -2,13 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt /app/requirements.txt
+# Copy and install service requirements
+COPY thread-svc/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY ../common /app/common
+# Copy and install shared common package
+COPY common /app/common
 RUN pip install -e /app/common
 
-COPY app /app/app
+# Copy service code
+COPY thread-svc/app /app/app
 
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8080
