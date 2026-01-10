@@ -104,12 +104,11 @@ platform-velero:
 	kubectl apply -f platform/velero/minio.yaml
 	@command -v velero >/dev/null 2>&1 || (echo "velero CLI not installed in this VM" && exit 1)
 	@tmpfile="$$(mktemp)"; \
-	cat > "$$tmpfile" <<'EOF'
-	
-[default]
-aws_access_key_id=minio
-aws_secret_access_key=minio12345
-EOF
+	printf "%s\n" \
+	  "[default]" \
+	  "aws_access_key_id=minio" \
+	  "aws_secret_access_key=minio12345" \
+	  > "$$tmpfile"; \
 	velero install \
 	  --namespace velero \
 	  --provider aws \
@@ -117,7 +116,7 @@ EOF
 	  --secret-file "$$tmpfile" \
 	  --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://minio.velero:9000 \
 	  --plugins velero/velero-plugin-for-aws:v1.11.0 \
-	  --use-node-agent=false
+	  --use-node-agent=false; \
 	rm -f "$$tmpfile"
 
 platform-keycloak:
