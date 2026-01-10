@@ -105,6 +105,7 @@ platform-velero:
 	@command -v velero >/dev/null 2>&1 || (echo "velero CLI not installed in this VM" && exit 1)
 	@tmpfile="$$(mktemp)"; \
 	cat > "$$tmpfile" <<'EOF'
+	
 [default]
 aws_access_key_id=minio
 aws_secret_access_key=minio12345

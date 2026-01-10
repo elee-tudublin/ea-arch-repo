@@ -14,7 +14,7 @@ set -euo pipefail
 # 5) Bootstraps: cluster, resolve versions, obs, apps-force, rabbitmq, messaging, keda, scaling
 #
 # Usage:
-#   export EA_REPO_URL="https://github.com/<org>/<repo>.git"
+#   export EA_REPO_URL="https://github.com/elee-tudublin/ea-arch-repo.git"
 #   export EA_REPO_DIR="$HOME/ea-arch-module"        # optional
 #   export EA_CLUSTER_NAME="ea-k3d"                  # optional
 #   export EA_DOCKER_PRUNE="yes"                     # optional ("yes" or "no")
