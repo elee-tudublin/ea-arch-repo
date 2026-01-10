@@ -102,10 +102,22 @@ platform-kyverno:
 
 platform-velero:
 	kubectl apply -f platform/velero/minio.yaml
-	./scripts/resolve_versions.sh
-	@source versions.lock && \
-	./scripts/helm_install_component.sh velero velero velero \
-	  "$$VELERO_CHART" "$$VELERO_VERSION" platform/velero/values.yaml
+	@command -v velero >/dev/null 2>&1 || (echo "velero CLI not installed in this VM" && exit 1)
+	@tmpfile="$$(mktemp)"; \
+	cat > "$$tmpfile" <<'EOF'
+[default]
+aws_access_key_id=minio
+aws_secret_access_key=minio12345
+EOF
+	velero install \
+	  --namespace velero \
+	  --provider aws \
+	  --bucket velero \
+	  --secret-file "$$tmpfile" \
+	  --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://minio.velero:9000 \
+	  --plugins velero/velero-plugin-for-aws:v1.11.0 \
+	  --use-node-agent=false
+	rm -f "$$tmpfile"
 
 platform-keycloak:
 	kubectl apply -f platform/identity/keycloak.yaml
@@ -132,5 +144,6 @@ clean:
 	kubectl delete ns openchat-dev --ignore-not-found=true
 
 apps-force:
+	@docker info >/dev/null 2>&1 || (echo "Docker not available to this user. Check docker group membership." && exit 1)
 	make -B apps
 
